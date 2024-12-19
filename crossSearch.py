@@ -4,33 +4,45 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.remote.webelement import WebElement
-import time,argparse,dotenv,os,pyautogui,datetime,pytz,ast
+import time,argparse,dotenv,os,datetime
 import seleniumUtil as SU
+from pokemonAttributes import PokemonAttribute
 
 chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--window-size=1920x1080")
 browser = webdriver.Chrome(options=chrome_options)
 
-pokemonWithMove = set()
-isMoveFound = False
+filteredPokemonSets:list[set] = []
 
-def getMoveName():
-    while not isMoveFound:
-        move = input("Enter the EXACT name of the move you want to search for: ").replace(" ","-").strip().lower()
-        browser.get(f'https://pokemondb.net/move/{move}')
-        isMoveFound = True
+def getFilteredPokemons(attribute: PokemonAttribute, attributeValue: str):
+    pokemonWithMove = set()
+    getAttributePage(attributeValue,attribute)
+    allPokemonElements = browser.find_elements(By.CLASS_NAME,"ent-name")
+    for pokemonElement in allPokemonElements:
+        pokemonWithMove.add(pokemonElement.text)
+    filteredPokemonSets.append(pokemonWithMove)
+    
+
+def getAttributePage(attributeName: str, attribute: PokemonAttribute):
+    isAttributeFound = False
+    while not isAttributeFound:
+        browser.get(f'https://pokemondb.net/{attribute}/{attributeName}')
+        isAttributeFound = True
         try:
-            isMoveFound = SU.wait_for_element(browser,(By.CLASS_NAME,"infocard"),5)
+            isAttributeFound = SU.wait_for_element(browser,(By.CLASS_NAME,"ent-name"),5)
         except:
-            print(f"Move '{move}' not found. Please try again.")
-            isMoveFound = False
+            print(f"{attribute} '{attributeName}' not found. Please try again.")
+            isAttributeFound = False
 
-getMoveName()
-browser.maximize_window()
-allPokemonElements = browser.find_elements(By.CLASS_NAME,"ent-name")
+canLearnFlamethrower = getFilteredPokemons(PokemonAttribute.MOVE,"flamethrower")
+canBeSturdy = getFilteredPokemons(PokemonAttribute.ABILITY,"sturdy")
+isGroundType = getFilteredPokemons(PokemonAttribute.TYPE,"ground")
 
-for pokemonElement in allPokemonElements:
-    pokemonWithMove.add(pokemonElement.text)
+filteredPokemonSet = set.intersection(*filteredPokemonSets)
 
-print(pokemonWithMove)
+print(f"Filtered pokemons :  {filteredPokemonSets}")
+
 
 browser.quit()
