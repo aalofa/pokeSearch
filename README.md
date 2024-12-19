@@ -1,6 +1,6 @@
 # Searching for a paticular pokemon has never been easier!
 
-This super simple script 
+This super simple script allows you to search for a precise pokemon using as much filters (Move, Type,Ability) as you want.
 
 Keep in mind this a Work in progress. I'm working on making it easier to use.
 
