@@ -8,7 +8,7 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--window-size=1920x1080")
-browser = webdriver.Chrome(options=chrome_options)
+browser = webdriver.Chrome(options=chrome_options) #support Safari, Firefox
 
 filteredPokemonSets:list[set] = [] #TODO: list[tuple[set,operation]] to allow the user to choose the operation (intersection, union);
 
@@ -19,6 +19,7 @@ def getFilteredPokemons(attribute: PokemonAttribute, attributeValue: str):
     for pokemonElement in allPokemonElements:
         pokemonWithMove.add(pokemonElement.text)
     filteredPokemonSets.append(pokemonWithMove) #TODO: allow the user to choose the operation (intersection, union);
+    print(f"Filter applied : has {attribute} -> {attributeValue}")
     
 
 def getAttributePage(attributeName: str, attribute: PokemonAttribute):
@@ -27,7 +28,7 @@ def getAttributePage(attributeName: str, attribute: PokemonAttribute):
         browser.get(f'https://pokemondb.net/{attribute}/{attributeName}')
         isAttributeFound = True
         try:
-            isAttributeFound = SU.wait_for_element(browser,(By.CLASS_NAME,"ent-name"),5)
+            isAttributeFound = SU.wait_for_element(browser,(By.CLASS_NAME,"ent-name"),2)
         except:
             print(f"{attribute} '{attributeName}' not found. Please try again.")
             isAttributeFound = False
