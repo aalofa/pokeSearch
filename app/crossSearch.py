@@ -21,8 +21,8 @@ def loadCache():
     global cachedTypes
     global cachedAbilities
     global cachedMoves
-    if os.path.exists("cache.json"):
-        with open("cache.json","r+") as cacheFile:
+    if os.path.exists("cache/cache.json"):
+        with open("cache/cache.json","r+") as cacheFile:
             cache = json.load(cacheFile)
             cachedTypes = cache["types"]
             cachedAbilities = cache["abilities"]
@@ -37,8 +37,18 @@ def getFilteredPokemons(attribute: PokemonAttribute, attributeValue: str):
         pokemonWithMove.add(pokemonElement.text)
     filteredPokemonSets.append(pokemonWithMove)
     print(f"Filter applied : has {attribute} -> {attributeValue}")
-    
 
+
+def verifyAttribute(attribute: PokemonAttribute, attributeValue: str):
+    if attribute == PokemonAttribute.TYPE:
+        return attributeValue in cachedTypes
+    elif attribute == PokemonAttribute.ABILITY:
+        return attributeValue in cachedAbilities
+    elif attribute == PokemonAttribute.MOVE:
+        return attributeValue in cachedMoves
+    else:
+        return False
+    
 def getAttributePage(attributeName: str, attribute: PokemonAttribute):
     isAttributeFound = False
     while not isAttributeFound:
@@ -74,7 +84,7 @@ def updateCache():
         global cachedMoves
         cache = {"timestamp": math.floor(time.time()), "types": cachedTypes, "abilities": cachedAbilities, "moves": cachedMoves}
         jsonData = json.dumps(cache, indent=4)
-        with open("cache.json","w") as cacheFile:
+        with open("cache/cache.json","w") as cacheFile:
             cacheFile.write(jsonData)
             cacheFile.close()
     else:
@@ -99,18 +109,18 @@ def getAllMoves():
     updateCache()
 
 def getCacheValidity():
-    if os.path.exists("cache.json"):
-        with open("cache.json","r") as cacheFile:
+    if os.path.exists("cache/cache.json"):
+        with open("cache/cache.json","r") as cacheFile:
             cache = json.load(cacheFile)
             cacheFile.close()
             return math.floor(time.time()) - cache["timestamp"] >= 86400
     return False
 
 
-loadCache()
+# loadCache()
 
-getAllMoves()
-getAllAbilities()
-getAllTypes()
+# getAllMoves()
+# getAllAbilities()
+# getAllTypes()
 
 browser.quit()
